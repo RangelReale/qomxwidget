@@ -6,18 +6,20 @@
 #include <QFileDialog>
 #include <QDebug>
 
-MainWindow::MainWindow() : QMainWindow()
+MainWindow::MainWindow() : QMainWindow(), _player(NULL)
 {
-    _player = new QOmxWidget::Player::Player(this);
-
-    connect(_player, SIGNAL(error(QString)), this, SLOT(error(QString)));
-    connect(_player, SIGNAL(started()), this, SLOT(started()));
-    connect(_player, SIGNAL(finished()), this, SLOT(finished()));
-
     _list = new QListWidget(this);
     setCentralWidget(_list);
 
 	QMenu* actmenu = menuBar()->addMenu("&Actions");
+
+	QAction *createmenu = actmenu->addAction("&Create");
+	connect(createmenu, SIGNAL(triggered(bool)), this, SLOT(menuCreate(bool)));
+
+	QAction *destroymenu = actmenu->addAction("&Destroy");
+	connect(destroymenu, SIGNAL(triggered(bool)), this, SLOT(menuDestroy(bool)));
+
+	actmenu->addSeparator();
 
 	QAction *startmenu = actmenu->addAction("&Start");
 	connect(startmenu, SIGNAL(triggered(bool)), this, SLOT(menuStart(bool)));
@@ -35,6 +37,24 @@ MainWindow::MainWindow() : QMainWindow()
 	connect(_timer, SIGNAL(timeout()), this, SLOT(timer()));
 
 	_timer->start(1000);
+}
+
+void MainWindow::menuCreate(bool)
+{
+    _player = new QOmxWidget::Player::Player(this);
+
+    connect(_player, SIGNAL(error(QString)), this, SLOT(error(QString)));
+    connect(_player, SIGNAL(started()), this, SLOT(started()));
+    connect(_player, SIGNAL(finished()), this, SLOT(finished()));
+}
+
+void MainWindow::menuDestroy(bool)
+{
+    if (_player)
+    {
+        delete _player;
+        _player = NULL;
+    }
 }
 
 void MainWindow::menuStart(bool)
@@ -79,5 +99,8 @@ void MainWindow::finished()
 
 void MainWindow::timer()
 {
-    qDebug() << "POSITION: " << _player->position() << " / " << _player->duration();
+    if (_player)
+    {
+        qDebug() << "POSITION: " << _player->position() << " / " << _player->duration();
+    }
 }

@@ -207,7 +207,7 @@ void Player::dbdConnected()
 
 void Player::processError(QProcess::ProcessError err)
 {
-    QString errorMessage("Process error");
+    QString errorMessage("Player Process error");
     switch (err) {
     case QProcess::ProcessError::FailedToStart: errorMessage += ": Failed to start"; break;
     case QProcess::ProcessError::Crashed: errorMessage += ": Crashed"; break;
@@ -253,7 +253,7 @@ void Player::processReadyReadStandardError()
 {
     if (_started)
     {
-        emit error(QString("Error output: %1").arg(QString::fromLocal8Bit(_process->readAll())));
+        emit error(QString("Player error output: %1").arg(QString::fromLocal8Bit(_process->readAll())));
     }
 }
 

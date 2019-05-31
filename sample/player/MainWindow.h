@@ -17,6 +17,9 @@ public Q_SLOTS:
     void started();
     void finished();
 
+    void menuCreate(bool);
+    void menuDestroy(bool);
+
     void menuStart(bool);
     void menuStop(bool);
     void menuPause(bool);
