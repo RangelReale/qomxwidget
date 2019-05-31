@@ -36,6 +36,13 @@ public:
 
     qint64 position() const;
     qint64 duration() const;
+
+    int left() const;
+    int top() const;
+    int width() const;
+    int height() const;
+
+    void setBounds(int left, int top, int width, int height);
 private:
     bool _started;
     bool _connected;
@@ -46,6 +53,7 @@ private:
     QDBusDaemon::Base *_dbd;
     QDBusConnection *_dbconn;
     bool _dbdOwned;
+    int _left, _top, _width, _height;
 private Q_SLOTS:
     void dbdStart();
     void processStart();

@@ -10,7 +10,8 @@ namespace QOmxWidget {
 namespace Player {
 
 Player::Player(QObject *parent) : QObject(parent), _started(false), _connected(false), _process(NULL),
-    _executable("/usr/bin/omxplayer.bin"), _executableParams(), _dbd(NULL), _dbconn(NULL)
+    _executable("/usr/bin/omxplayer.bin"), _executableParams(), _dbd(NULL), _dbconn(NULL),
+    _left(100), _top(100), _width(200), _height(160)
 {
 
 }
@@ -144,6 +145,34 @@ qint64 Player::duration() const
     return 0;
 }
 
+int Player::left() const
+{
+    return _left;
+}
+
+int Player::top() const
+{
+    return _top;
+}
+
+int Player::width() const
+{
+    return _width;
+}
+
+int Player::height() const
+{
+    return _height;
+}
+
+void Player::setBounds(int left, int top, int width, int height)
+{
+    _left = left;
+    _top = top;
+    _width = width;
+    _height = height;
+}
+
 void Player::dbdStart()
 {
     if (!_dbd)
@@ -178,7 +207,7 @@ void Player::processStart()
         QStringList params;
         params.append(_executableParams);
         params
-            << "--win" << "500,500,1000,1000"
+            << "--win" << QString("%1,%2,%3,%4").arg(_left).arg(_top).arg(_left+_width).arg(_top+_height)
             << _filename;
 
         _process->setEnvironment(_dbd->environmentVariables());
