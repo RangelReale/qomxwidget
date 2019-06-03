@@ -298,6 +298,8 @@ void Player::processStarted()
 
 void Player::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
+    qDebug() << "processFinished: " << exitCode << " --- " << static_cast<int>(exitStatus);
+
     if (_dbconn)
     {
         delete _dbconn;
@@ -310,7 +312,16 @@ void Player::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
     _process->deleteLater();
     _process = NULL;
 
-    emit finished();
+    if (exitStatus == QProcess::NormalExit && exitCode == 0)
+    {
+        emit finished();
+    }
+    else
+    {
+        emit error(QString("OMXPlayer process %1 with exit code %2")
+            .arg(exitStatus==QProcess::NormalExit?QString("finished"):QString("crashed"))
+            .arg(exitCode));
+    }
 }
 
 void Player::processReadyReadStandardError()
