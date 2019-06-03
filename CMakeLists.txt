@@ -10,8 +10,12 @@ LINK_DIRECTORIES(${LIBRARY_OUTPUT_PATH})
 
 set(CMAKE_DEBUG_POSTFIX "d")
 
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
+include(VQtVersion)
+
 OPTION ( ENABLE_WIDGET "Enable widget" ON )
 
+set(QDBusDaemon_QTVERSION ${VQTVERSION} CACHE STRING "")
 find_package(QDBusDaemon REQUIRED)
 
 include_directories(${CMAKE_SOURCE_DIR}/include)

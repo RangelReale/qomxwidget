@@ -1,15 +1,26 @@
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-find_package(Qt4 REQUIRED QtGui)
 
-add_executable(qdomxwidgetplayer_sample
+if (VQTVERSION STREQUAL QT5)
+	find_package(Qt5 COMPONENTS Widgets REQUIRED)
+elseif (VQTVERSION STREQUAL QT4)
+	find_package(Qt4 REQUIRED QtGui)
+endif()
+SET( TARGET_BASE_NAME qdomxwidgetplayer${VQTVERSION_SUFFIX}_sample )
+
+add_executable(${TARGET_BASE_NAME}
 	main.cpp
 	MainWindow.h
 	MainWindow.cpp
 )
 
-target_link_libraries(qdomxwidgetplayer_sample
-	qomxwidgetplayer
+target_link_libraries(${TARGET_BASE_NAME}
+	qomxwidgetplayer${VQTVERSION_SUFFIX}
 	QDBusDaemon::QDBusDaemon
-	Qt4::QtGui
 )
+
+if (VQTVERSION STREQUAL QT5)
+	target_link_libraries(${TARGET_BASE_NAME} Qt5::Widgets)
+elseif (VQTVERSION STREQUAL QT4)
+	target_link_libraries(${TARGET_BASE_NAME} Qt4::QtGui)
+endif()

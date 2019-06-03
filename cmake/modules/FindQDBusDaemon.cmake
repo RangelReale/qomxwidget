@@ -14,6 +14,20 @@
 #   QDBusDaemon::QDBusDaemon   - The QDBusDaemon library
 #
 
+set (AVAIL_QDBusDaemon_QTVERSION QT4 QT5)
+set(QDBusDaemon_QTVERSION "" CACHE STRING "Qt Version (${AVAIL_QDBusDaemon_QTVERSION})")
+set_property(CACHE QDBusDaemon_QTVERSION PROPERTY STRINGS ${AVAIL_QDBusDaemon_QTVERSION})
+
+if (QDBusDaemon_QTVERSION STREQUAL "")
+	message(FATAL_ERROR "QDBusDaemon_QTVERSION not set")
+endif ()
+
+if (QDBusDaemon_QTVERSION STREQUAL QT5)
+  SET (QDBusDaemon_QTVERSION_SUFFIX 5)
+elseif (QDBusDaemon_QTVERSION STREQUAL QT4)
+  SET (QDBusDaemon_QTVERSION_SUFFIX 4)
+endif()
+
 # find the include path
 find_path(QDBusDaemon_INCLUDE_DIR
   NAMES Base.h
@@ -31,12 +45,12 @@ endif()
 if (QDBusDaemon_DEBUG_AND_RELEASE)
 	# find release library
 	find_library(QDBusDaemon_LIBRARY_RELEASE
-	  NAMES qdbusdaemon
+	  NAMES qdbusdaemon${QDBusDaemon_QTVERSION_SUFFIX}
 	)
 
 	# find debug library
 	find_library(QDBusDaemon_LIBRARY_DEBUG
-	  NAMES qdbusdaemon
+	  NAMES qdbusdaemon${QDBusDaemon_QTVERSION_SUFFIX}
 	)
 
 	# only release is required
@@ -50,7 +64,7 @@ if (QDBusDaemon_DEBUG_AND_RELEASE)
 else()
 	# find library
 	find_library(QDBusDaemon_LIBRARY
-	  NAMES qdbusdaemon
+	  NAMES qdbusdaemon${QDBusDaemon_QTVERSION_SUFFIX}
 	)
 
 	find_package_handle_standard_args(QDBusDaemon
