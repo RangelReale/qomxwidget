@@ -2,6 +2,7 @@
 
 #include <QDBusMessage>
 #include <QDebug>
+#include <QTime>
 
 #include <qdbusdaemon/Process.h>
 
@@ -11,7 +12,7 @@ namespace Player {
 
 Player::Player(QObject *parent) : QObject(parent), _started(false), _connected(false), _process(NULL),
     _executable("/usr/bin/omxplayer.bin"), _executableParams(), _dbd(NULL), _dbconn(NULL),
-    _left(100), _top(100), _width(200), _height(160)
+    _left(100), _top(100), _width(200), _height(160), _dbusnamesuffix(), _autodbusnamesuffix(false)
 {
 
 }
@@ -91,7 +92,7 @@ void Player::play()
 {
     if (_dbconn)
     {
-        QDBusMessage message = QDBusMessage::createMethodCall("org.mpris.MediaPlayer2.omxplayer", "/org/mpris/MediaPlayer2", "org.mpris.MediaPlayer2.Player", "Play");
+        QDBusMessage message = QDBusMessage::createMethodCall(currentDBusName(), "/org/mpris/MediaPlayer2", "org.mpris.MediaPlayer2.Player", "Play");
         QDBusMessage reply = _dbconn->call(message);
         qDebug() << reply;
     }
@@ -101,7 +102,7 @@ void Player::pause()
 {
     if (_dbconn)
     {
-        QDBusMessage message = QDBusMessage::createMethodCall("org.mpris.MediaPlayer2.omxplayer", "/org/mpris/MediaPlayer2", "org.mpris.MediaPlayer2.Player", "Pause");
+        QDBusMessage message = QDBusMessage::createMethodCall(currentDBusName(), "/org/mpris/MediaPlayer2", "org.mpris.MediaPlayer2.Player", "Pause");
         QDBusMessage reply = _dbconn->call(message);
         qDebug() << reply;
     }
@@ -111,7 +112,7 @@ void Player::stop()
 {
     if (_dbconn)
     {
-        QDBusMessage message = QDBusMessage::createMethodCall("org.mpris.MediaPlayer2.omxplayer", "/org/mpris/MediaPlayer2", "org.mpris.MediaPlayer2.Player", "Stop");
+        QDBusMessage message = QDBusMessage::createMethodCall(currentDBusName(), "/org/mpris/MediaPlayer2", "org.mpris.MediaPlayer2.Player", "Stop");
         QDBusMessage reply = _dbconn->call(message);
         qDebug() << reply;
     }
@@ -121,7 +122,7 @@ qint64 Player::position() const
 {
     if (_dbconn)
     {
-        QDBusMessage message = QDBusMessage::createMethodCall("org.mpris.MediaPlayer2.omxplayer", "/org/mpris/MediaPlayer2", "org.freedesktop.DBus.Properties", "Get");
+        QDBusMessage message = QDBusMessage::createMethodCall(currentDBusName(), "/org/mpris/MediaPlayer2", "org.freedesktop.DBus.Properties", "Get");
         message.setArguments(QList<QVariant>() << "org.mpris.MediaPlayer2.Player" << "Position");
         QDBusMessage reply = _dbconn->call(message);
         qDebug() << reply;
@@ -136,7 +137,7 @@ qint64 Player::duration() const
 {
     if (_dbconn)
     {
-        QDBusMessage message = QDBusMessage::createMethodCall("org.mpris.MediaPlayer2.omxplayer", "/org/mpris/MediaPlayer2", "org.freedesktop.DBus.Properties", "Get");
+        QDBusMessage message = QDBusMessage::createMethodCall(currentDBusName(), "/org/mpris/MediaPlayer2", "org.freedesktop.DBus.Properties", "Get");
         message.setArguments(QList<QVariant>() << "org.mpris.MediaPlayer2.Player" << "Duration");
         QDBusMessage reply = _dbconn->call(message);
         qDebug() << reply;
@@ -175,6 +176,33 @@ void Player::setBounds(int left, int top, int width, int height)
     _height = height;
 }
 
+const QString &Player::dbusNameSuffix() const
+{
+    return _dbusnamesuffix;
+}
+
+void Player::setDBusNameSuffix(const QString &value)
+{
+    _dbusnamesuffix = value;
+}
+
+bool Player::autoDBusNameSuffix() const
+{
+    return _autodbusnamesuffix;
+}
+
+void Player::setAutoDBusNameSuffix(bool value)
+{
+    if (value != _autodbusnamesuffix)
+    {
+        _autodbusnamesuffix = value;
+        if (value && _dbusnamesuffix.isEmpty())
+        {
+            _dbusnamesuffix = genRandomName();
+        }
+    }
+}
+
 void Player::dbdStart()
 {
     if (!_dbd)
@@ -211,6 +239,11 @@ void Player::processStart()
         params
             << "--win" << QString("%1,%2,%3,%4").arg(_left).arg(_top).arg(_left+_width).arg(_top+_height)
             << _filename;
+        if (!_dbusnamesuffix.isEmpty())
+        {
+            params << "--dbus_name" << currentDBusName();
+            qDebug() << "DBUS NAME: " << currentDBusName();
+        }
 
         _process->setEnvironment(_dbd->environmentVariables());
         qDebug() << "IS CONNECTED: " << _dbd->isConnected();
@@ -290,6 +323,29 @@ void Player::processReadyReadStandardError()
 
 void Player::processReadyReadStandardOutput()
 {
+}
+
+QString Player::genRandomName() const
+{
+    const int length = 12;
+    const QString allow_symbols = "ABCDEFGHIJKLMNOPQRSTUWXYZabcdefghijklmnopqrtsuwxyz";
+
+    QString result;
+    qsrand(QTime::currentTime().msec());
+    for (int i=0; i<length; ++i) {
+        result.append(allow_symbols.at(qrand() % (allow_symbols.length())));
+    }
+    return result;
+}
+
+QString Player::currentDBusName() const
+{
+    QString name("org.mpris.MediaPlayer2.omxplayer");
+    if (!_dbusnamesuffix.isEmpty())
+    {
+        name.append(QString("-%1").arg(_dbusnamesuffix));
+    }
+    return name;
 }
 
 } }

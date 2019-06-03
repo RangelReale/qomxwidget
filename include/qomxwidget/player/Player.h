@@ -37,23 +37,18 @@ public:
     qint64 position() const;
     qint64 duration() const;
 
+    const QString &dbusNameSuffix() const;
+    void setDBusNameSuffix(const QString &value);
+
+    bool autoDBusNameSuffix() const;
+    void setAutoDBusNameSuffix(bool value);
+
     int left() const;
     int top() const;
     int width() const;
     int height() const;
 
     void setBounds(int left, int top, int width, int height);
-private:
-    bool _started;
-    bool _connected;
-    QProcess *_process;
-    QString _executable;
-    QStringList _executableParams;
-    QString _filename;
-    QDBusDaemon::Base *_dbd;
-    QDBusConnection *_dbconn;
-    bool _dbdOwned;
-    int _left, _top, _width, _height;
 private Q_SLOTS:
     void dbdStart();
     void processStart();
@@ -73,6 +68,22 @@ Q_SIGNALS:
     void playing();
     void paused();
     void finished();
+private:
+    QString currentDBusName() const;
+    QString genRandomName() const;
+
+    bool _started;
+    bool _connected;
+    QProcess *_process;
+    QString _executable;
+    QStringList _executableParams;
+    QString _filename;
+    QDBusDaemon::Base *_dbd;
+    QDBusConnection *_dbconn;
+    bool _dbdOwned;
+    int _left, _top, _width, _height;
+    QString _dbusnamesuffix;
+    bool _autodbusnamesuffix;
 };
 
 } }
