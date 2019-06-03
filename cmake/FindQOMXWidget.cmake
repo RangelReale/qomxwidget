@@ -14,6 +14,21 @@
 #   QOMXWidget::QOMXWidget   - The QOMXWidget library
 #
 
+set (AVAIL_QOMXWidget_QTVERSION QT4 QT5)
+set(QOMXWidget_QTVERSION "" CACHE STRING "Qt Version (${AVAIL_QOMXWidget_QTVERSION})")
+set_property(CACHE QOMXWidget_QTVERSION PROPERTY STRINGS ${AVAIL_QOMXWidget_QTVERSION})
+
+if (QOMXWidget_QTVERSION STREQUAL "")
+	message(FATAL_ERROR "QOMXWidget_QTVERSION not set")
+endif ()
+
+if (QOMXWidget_QTVERSION STREQUAL QT5)
+  SET (QOMXWidget_QTVERSION_SUFFIX 5)
+elseif (QOMXWidget_QTVERSION STREQUAL QT4)
+  SET (QOMXWidget_QTVERSION_SUFFIX 4)
+endif()
+
+
 set(QOMXWidget_ENABLE_WIDGET OFF CACHE BOOL "Enable OMX widget")
 
 # find the include path
@@ -33,12 +48,12 @@ endif()
 if (QOMXWidget_DEBUG_AND_RELEASE)
 	# find release library
 	find_library(QOMXWidgetPlayer_LIBRARY_RELEASE
-	  NAMES qomxwidgetplayer
+	  NAMES qomxwidgetplayer${QOMXWidget_QTVERSION_SUFFIX}
 	)
 
 	# find debug library
 	find_library(QOMXWidgetPlayer_LIBRARY_DEBUG
-	  NAMES qomxwidgetplayer
+	  NAMES qomxwidgetplayer${QOMXWidget_QTVERSION_SUFFIX}
 	)
 
 	# only release is required
@@ -51,12 +66,12 @@ if (QOMXWidget_DEBUG_AND_RELEASE)
 	if (QOMXWidget_ENABLE_WIDGET)
 		# find release library
 		find_library(QOMXWidget_LIBRARY_RELEASE
-		  NAMES qomxwidget
+		  NAMES qomxwidget${QOMXWidget_QTVERSION_SUFFIX}
 		)
 	
 		# find debug library
 		find_library(QOMXWidget_LIBRARY_DEBUG
-		  NAMES qomxwidget
+		  NAMES qomxwidget${QOMXWidget_QTVERSION_SUFFIX}
 		)
 	
 		# only release is required
@@ -70,7 +85,7 @@ if (QOMXWidget_DEBUG_AND_RELEASE)
 else()
 	# find library
 	find_library(QOMXWidgetPlayer_LIBRARY
-	  NAMES qomxwidgetplayer
+	  NAMES qomxwidgetplayer${QOMXWidget_QTVERSION_SUFFIX}
 	)
 
 	find_package_handle_standard_args(QOMXWidgetPlayer
@@ -83,7 +98,7 @@ else()
 	if (QOMXWidget_ENABLE_WIDGET)
 		# find library
 		find_library(QOMXWidget_LIBRARY
-		  NAMES qomxwidget
+		  NAMES qomxwidget${QOMXWidget_QTVERSION_SUFFIX}
 		)
 	
 		find_package_handle_standard_args(QOMXWidget
