@@ -70,11 +70,13 @@ void Player::setDBusDaemon(QDBusDaemon::Base *dbd)
             delete _dbd;
         }
         _dbd = NULL;
+        _dbdOwned = false;
     }
 
     if (dbd)
     {
         _dbd = dbd;
+        connect(_dbd, SIGNAL(connected()), this, SLOT(dbdConnected()));
         _dbdOwned = false;
     }
 }
