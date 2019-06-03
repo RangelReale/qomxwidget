@@ -41,7 +41,7 @@ MainWindow::MainWindow() : QMainWindow(), _player(NULL)
 
 void MainWindow::menuCreate(bool)
 {
-    _player = new QOmxWidget::Player::Player(this);
+    _player = new QOMXWidget::Player::Player(this);
 
     connect(_player, SIGNAL(error(QString)), this, SLOT(error(QString)));
     connect(_player, SIGNAL(started()), this, SLOT(started()));

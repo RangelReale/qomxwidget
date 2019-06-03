@@ -24,7 +24,7 @@ public Q_SLOTS:
 
     void timer();
 private:
-    QOmxWidget::Widget::Widget* _player;
+    QOMXWidget::Widget::Widget* _player;
     QListWidget *_list;
     QTimer *_timer;
 };

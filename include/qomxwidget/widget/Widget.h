@@ -5,7 +5,7 @@
 
 #include <QWidget>
 
-namespace QOmxWidget {
+namespace QOMXWidget {
 namespace Widget {
 
 class Widget : public QWidget

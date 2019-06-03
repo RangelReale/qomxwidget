@@ -15,7 +15,7 @@ MainWindow::MainWindow() : QMainWindow(), _player(NULL)
     QVBoxLayout *layout = new QVBoxLayout;
     central->setLayout(layout);
 
-    _player = new QOmxWidget::Widget::Widget(this);
+    _player = new QOMXWidget::Widget::Widget(this);
 
     connect(_player, SIGNAL(error(QString)), this, SLOT(error(QString)));
     connect(_player, SIGNAL(started()), this, SLOT(started()));

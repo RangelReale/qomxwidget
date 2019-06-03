@@ -1,6 +1,6 @@
 #include "qomxwidget/widget/Widget.h"
 
-namespace QOmxWidget {
+namespace QOMXWidget {
 namespace Widget {
 
 Widget::Widget(QWidget *parent) : QWidget(parent), _player(this)

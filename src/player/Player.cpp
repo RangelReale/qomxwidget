@@ -6,7 +6,7 @@
 #include <qdbusdaemon/Process.h>
 
 
-namespace QOmxWidget {
+namespace QOMXWidget {
 namespace Player {
 
 Player::Player(QObject *parent) : QObject(parent), _started(false), _connected(false), _process(NULL),

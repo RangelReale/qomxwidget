@@ -7,7 +7,7 @@
 
 #include <qdbusdaemon/Base.h>
 
-namespace QOmxWidget {
+namespace QOMXWidget {
 namespace Player {
 
 class Player : public QObject
