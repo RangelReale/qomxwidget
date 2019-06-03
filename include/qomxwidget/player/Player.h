@@ -68,6 +68,7 @@ Q_SIGNALS:
     void playing();
     void paused();
     void finished();
+    void trace(QString message) const;
 private:
     QString currentDBusName() const;
     QString genRandomName() const;

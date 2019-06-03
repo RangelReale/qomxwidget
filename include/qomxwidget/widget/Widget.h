@@ -31,6 +31,7 @@ Q_SIGNALS:
     void playing();
     void paused();
     void finished();
+    void trace(QString message);
 private:
     Player::Player _player;
 };

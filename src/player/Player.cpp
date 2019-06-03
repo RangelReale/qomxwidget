@@ -1,7 +1,6 @@
 #include "qomxwidget/player/Player.h"
 
 #include <QDBusMessage>
-#include <QDebug>
 #include <QTime>
 
 #include <qdbusdaemon/Process.h>
@@ -94,7 +93,11 @@ void Player::play()
     {
         QDBusMessage message = QDBusMessage::createMethodCall(currentDBusName(), "/org/mpris/MediaPlayer2", "org.mpris.MediaPlayer2.Player", "Play");
         QDBusMessage reply = _dbconn->call(message);
-        qDebug() << reply;
+        if (reply.type() == QDBusMessage::ErrorMessage)
+        {
+            emit trace(QString("Error in play message: %1").arg(reply.errorMessage()));
+        }
+        //qDebug() << reply;
     }
 }
 
@@ -104,7 +107,11 @@ void Player::pause()
     {
         QDBusMessage message = QDBusMessage::createMethodCall(currentDBusName(), "/org/mpris/MediaPlayer2", "org.mpris.MediaPlayer2.Player", "Pause");
         QDBusMessage reply = _dbconn->call(message);
-        qDebug() << reply;
+        if (reply.type() == QDBusMessage::ErrorMessage)
+        {
+            emit trace(QString("Error in pause message: %1").arg(reply.errorMessage()));
+        }
+        //qDebug() << reply;
     }
 }
 
@@ -114,7 +121,11 @@ void Player::stop()
     {
         QDBusMessage message = QDBusMessage::createMethodCall(currentDBusName(), "/org/mpris/MediaPlayer2", "org.mpris.MediaPlayer2.Player", "Stop");
         QDBusMessage reply = _dbconn->call(message);
-        qDebug() << reply;
+        if (reply.type() == QDBusMessage::ErrorMessage)
+        {
+            emit trace(QString("Error in stop message: %1").arg(reply.errorMessage()));
+        }
+        //qDebug() << reply;
     }
 }
 
@@ -125,9 +136,12 @@ qint64 Player::position() const
         QDBusMessage message = QDBusMessage::createMethodCall(currentDBusName(), "/org/mpris/MediaPlayer2", "org.freedesktop.DBus.Properties", "Get");
         message.setArguments(QList<QVariant>() << "org.mpris.MediaPlayer2.Player" << "Position");
         QDBusMessage reply = _dbconn->call(message);
-        qDebug() << reply;
         if (reply.type() == QDBusMessage::ReplyMessage) {
             return reply.arguments().at(0).toULongLong();
+        }
+        else if (reply.type() == QDBusMessage::ErrorMessage)
+        {
+            emit trace(QString("Error in position message: %1").arg(reply.errorMessage()));
         }
     }
     return 0;
@@ -140,9 +154,13 @@ qint64 Player::duration() const
         QDBusMessage message = QDBusMessage::createMethodCall(currentDBusName(), "/org/mpris/MediaPlayer2", "org.freedesktop.DBus.Properties", "Get");
         message.setArguments(QList<QVariant>() << "org.mpris.MediaPlayer2.Player" << "Duration");
         QDBusMessage reply = _dbconn->call(message);
-        qDebug() << reply;
+        //qDebug() << reply;
         if (reply.type() == QDBusMessage::ReplyMessage) {
             return reply.arguments().at(0).toULongLong();
+        }
+        else if (reply.type() == QDBusMessage::ErrorMessage)
+        {
+            emit trace(QString("Error in duration message: %1").arg(reply.errorMessage()));
         }
     }
     return 0;
@@ -242,12 +260,12 @@ void Player::processStart()
         if (!_dbusnamesuffix.isEmpty())
         {
             params << "--dbus_name" << currentDBusName();
-            qDebug() << "DBUS NAME: " << currentDBusName();
+            //qDebug() << "DBUS NAME: " << currentDBusName();
+            emit trace(QString("DBUS name: %1").arg(currentDBusName()));
         }
 
         _process->setEnvironment(_dbd->environmentVariables());
-        qDebug() << "IS CONNECTED: " << _dbd->isConnected();
-        qDebug() << "ENV: " << _dbd->environmentVariables();
+        //qDebug() << "ENV: " << _dbd->environmentVariables();
         _started = true;
         _process->start(_executable, params);
     }
@@ -264,7 +282,8 @@ void Player::processStop()
 
 void Player::dbdConnected()
 {
-    qDebug() << "DBD CONNECTED: " << _dbd->address();
+    //qDebug() << "DBD CONNECTED: " << _dbd->address();
+    emit trace(QString("DBUS daemon connected: %1").arg(_dbd->address()));
 
     emit processStart();
 }
@@ -288,7 +307,6 @@ void Player::processStarted()
 {
     if (_started)
     {
-        qDebug() << _dbd->address();
         _dbconn = new QDBusConnection(QDBusConnection::connectToBus(_dbd->address(), "qomxwidget_player"));
 
         _connected = true;
@@ -298,7 +316,8 @@ void Player::processStarted()
 
 void Player::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
-    qDebug() << "processFinished: " << exitCode << " --- " << static_cast<int>(exitStatus);
+    // qDebug() << "processFinished: " << exitCode << " --- " << static_cast<int>(exitStatus);
+    emit trace(QString("Process finished: exitCode %1, exitStatus %2").arg(exitCode).arg(static_cast<int>(exitStatus)));
 
     if (_dbconn)
     {
@@ -312,7 +331,7 @@ void Player::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
     _process->deleteLater();
     _process = NULL;
 
-    if (exitStatus == QProcess::NormalExit && exitCode == 0)
+    if (exitStatus == QProcess::NormalExit && (exitCode == 0 || exitCode == 3)) // when using the Stop command, the player returns 3
     {
         emit finished();
     }

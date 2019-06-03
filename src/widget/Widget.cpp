@@ -11,6 +11,7 @@ Widget::Widget(QWidget *parent) : QWidget(parent), _player(this)
     connect(&_player, SIGNAL(playing()), this, SIGNAL(playing()));
     connect(&_player, SIGNAL(paused()), this, SIGNAL(paused()));
     connect(&_player, SIGNAL(finished()), this, SIGNAL(finished()));
+    connect(&_player, SIGNAL(trace(QString)), this, SIGNAL(trace(QString)));
 }
 
 Widget::~Widget()
