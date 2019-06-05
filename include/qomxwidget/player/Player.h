@@ -37,6 +37,9 @@ public:
     qint64 position() const;
     qint64 duration() const;
 
+    bool useDBus() const;
+    void setUseDBus(bool value);
+
     const QString &dbusNameSuffix() const;
     void setDBusNameSuffix(const QString &value);
 
@@ -73,6 +76,7 @@ private:
     QString currentDBusName() const;
     QString genRandomName() const;
 
+    bool _usedbus;
     bool _started;
     bool _connected;
     QProcess *_process;

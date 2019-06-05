@@ -42,10 +42,12 @@ MainWindow::MainWindow() : QMainWindow(), _player(NULL)
 void MainWindow::menuCreate(bool)
 {
     _player = new QOMXWidget::Player::Player(this);
+    //_player->setUseDBus(false);
 
     connect(_player, SIGNAL(error(QString)), this, SLOT(error(QString)));
     connect(_player, SIGNAL(started()), this, SLOT(started()));
     connect(_player, SIGNAL(finished()), this, SLOT(finished()));
+    connect(_player, SIGNAL(trace(QString)), this, SLOT(trace(QString)));
 }
 
 void MainWindow::menuDestroy(bool)
@@ -95,6 +97,11 @@ void MainWindow::started()
 void MainWindow::finished()
 {
     new QListWidgetItem("FINISHED", _list);
+}
+
+void MainWindow::trace(QString message)
+{
+    new QListWidgetItem(QString("TRACE: %1").arg(message), _list);
 }
 
 void MainWindow::timer()

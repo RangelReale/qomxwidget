@@ -16,6 +16,7 @@ public Q_SLOTS:
     void error(QString message);
     void started();
     void finished();
+    void trace(QString message);
 
     void menuCreate(bool);
     void menuDestroy(bool);
