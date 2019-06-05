@@ -5,6 +5,11 @@ namespace Widget {
 
 Widget::Widget(QWidget *parent) : QWidget(parent), _player(this)
 {
+    QPalette p(palette());
+    p.setColor(backgroundRole(), Qt::black);
+    setPalette(p);
+    setAutoFillBackground(true);
+
     connect(&_player, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
     connect(&_player, SIGNAL(started()), this, SIGNAL(started()));
     connect(&_player, SIGNAL(loaded()), this, SIGNAL(loaded()));

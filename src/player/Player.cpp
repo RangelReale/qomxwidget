@@ -341,6 +341,7 @@ void Player::processStarted()
         }
 
         _connected = true;
+        emit loaded();
         emit started();
     }
 }
